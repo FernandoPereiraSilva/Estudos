@@ -1,0 +1,138 @@
+<html>
+	<head>
+		<title>Curso de Spring Boot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="default.css">
+		<script type="text/javascript" src="webjars/jquery/3.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="default.js"></script>  
+	</head>
+	<body>
+		<script> 
+			$(function(){
+				loadDefault();
+				
+				if ($("#idCliente").val() != "") {
+					$.ajax({
+						type: "GET",
+						url: Dictionary.Service.Cliente.CONSULTAR + "?idCliente=" + $("#idCliente").val(),
+						contentType: "application/json;",
+						success: function(json) {
+							if (json != "") {
+								jsonToFields(json);
+							} else {
+								$("#buttonExcluirCliente").hide();
+								alert("Não foi encontrado nenhum Cliente");
+							}
+						},
+						error: function(e){
+							$("#buttonExcluirCliente").hide();
+							alert("Erro ao buscar dados");
+						}
+					});
+				} else {
+					$("#buttonExcluirCliente").hide();
+				}
+			});
+			
+			function salvarCliente() {
+				if ($("#nome").val() != "") {
+					var method = "POST";
+					var url = Dictionary.Service.Cliente.CADASTRAR;
+					var data = {
+						nome: $("#nome").val(),
+						endereco: $("#endereco").val()
+					};
+					
+					if ($("#idCliente").val() != "") {
+						method = "PUT";
+						url = Dictionary.Service.Cliente.ALTERAR;
+						data.idCliente = $("#idCliente").val();
+					}
+					
+					$.ajax({
+						type: method,
+						url: url,
+						contentType: "application/json;",
+						dataType: "json",
+						data: JSON.stringify(data),
+						success: function(json) {
+							$("#idCliente").val(json.idCliente);
+							$("#buttonExcluirCliente").show();
+							alert("Cadastro salvo com sucesso!");
+						},
+						error: function(e){
+							alert("Erro ao salvar o Cliente");
+						}
+					});
+				} else {
+					alert("Favor preencher o nome do Cliente");
+				}
+			}
+			
+			function deletarCliente() {
+				if ($("#id").val() != "") {
+					var data = {
+						idCliente: $("#idCliente").val()
+					};
+					
+					$.ajax({
+						type: "DELETE",
+						url: Dictionary.Service.Cliente.DELETAR,
+						contentType: "application/json;",
+						dataType: "json",
+						data: JSON.stringify(data),
+						success: function(json) {
+							$("#idCliente").val("");
+							$("#nome").val("");
+							$("#endereco").val("");
+							$("#buttonExcluirCliente").hide();
+							alert("Cliente deletado");
+						},
+						error: function(e){
+							alert("Erro ao deletar o Cliente");
+						}
+					});
+				} else {
+					alert("Favor preencher o Identificador do Cliente");
+				}
+			}
+		</script>
+		
+		<div id="defaultNav"></div>
+		<br/>
+		<div class="container">
+			<div class="card">
+				<div class="card-body">
+					<h3>Cadastro de Clientes</h3>
+					<hr/>
+					<form>
+						<div class="form-group row">
+							<label for="staticIdCliente" class="col-sm-2 col-form-label">Identificador</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="idCliente" name="idCliente" readonly>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="staticNome" class="col-sm-2 col-form-label">Nome</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="nome">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="staticEndereco" class="col-sm-2 col-form-label">Endereço</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="endereco">
+							</div>
+						</div>
+						<br/>
+						<button type="button" class="btn btn-success" onclick="salvarCliente()" >Salvar</button>
+						<button type="button" class="btn btn-danger" onclick="deletarCliente()" id="buttonExcluirCliente">Excluir</button>
+						<a class="btn btn-warning" href="ClientesConsulta.html">Voltar</a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

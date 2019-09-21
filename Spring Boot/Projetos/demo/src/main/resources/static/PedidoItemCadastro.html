@@ -1,0 +1,114 @@
+<html>
+	<head>
+		<title>Curso de Spring Boot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="default.css">
+		<link rel="stylesheet" type="text/css" href="webjars/fancybox/2.1.5/jquery.fancybox.css" />
+		<link rel="stylesheet" type="text/css" href="webjars/fancybox/2.1.5/helpers/jquery.fancybox-thumbs.css" />
+		<script type="text/javascript" src="webjars/jquery/3.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="webjars/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+		<script type="text/javascript" src="webjars/fancybox/2.1.5/helpers/jquery.fancybox-thumbs.js"></script>
+		<script type="text/javascript" src="default.js"></script>
+	</head>
+	<body>
+		<script>
+			$(function(){
+				loadDefault();
+				loadProduto();
+				
+				$("#pedidoItemPK\\.pedido\\.idPedido").val($("#idPedido").val());
+				if ($("#PedidoItemCadastroContainer #readonly").val() == "true") {
+					$("#PedidoItemCadastroContainer #pedidoItemPK\\.produto\\.idProduto, #PedidoItemCadastroContainer #quantidade").attr("readonly", true).attr("disabled", true);
+					$("#salvarPedidoItem").hide();
+				} else {
+					$("#PedidoItemCadastroContainer #pedidoItemPK\\.produto\\.idProduto, #PedidoItemCadastroContainer #quantidade").attr("readonly", false).attr("disabled", false);
+					$("#salvarPedidoItem").show().on("click", salvarPedidoItem);
+				}
+			});
+			
+			function loadProduto() {
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.Produto.CONSULTAR_TODOS,
+					contentType: "application/json;",
+					dataType: "json",
+					success: function(json) {
+						$("#pedidoItemPK\\.produto\\.idProduto").empty();
+						$("#pedidoItemPK\\.produto\\.idProduto").append($("<option/>").attr("value", "").html(Dictionary.COMBO_BOX));
+						$(json).each(function(index, item) {
+							$("#pedidoItemPK\\.produto\\.idProduto").append($("<option/>").attr("value", item.idProduto).html(item.nome));
+						});
+					},
+					error: function(e){
+						alert("Erro ao buscar produtos");
+					}
+				});
+			}
+			
+			function salvarPedidoItem() {
+				if (fieldsRequired("PedidoItemCadastroContainer")) {
+					var data = fieldsToJson("PedidoItemCadastroContainer", "#pedidoItemPK\\.produto\\.idProduto, #quantidade, #pedidoItemPK\\.pedido\\.idPedido");
+					
+					$.ajax({
+						type: "POST",
+						url: Dictionary.Service.PedidoItem.CADASTRAR,
+						contentType: "application/json;",
+						dataType: "json",
+						data: JSON.stringify(data),
+						success: function(json) {
+							loadPedidoItens();
+							limparPedidoItem();
+							alert("Item salvo");
+						},
+						error: function(e){
+							alert("Erro ao salvar o item do pedido");
+						}
+					});
+				} else {
+					alert("Favor preencher os campos obrigatórios");
+				}
+			}
+			
+			function limparPedidoItem() {
+				$("#PedidoItemCadastroContainer #pedidoItemPK\\.produto\\.idProduto").attr("readonly", false).val("");
+				$("#PedidoItemCadastroContainer #quantidade").val("");
+				$("#PedidoItemCadastroContainer #cancelarPedidoItem").hide();
+				$("#PedidoItemConsultaContainer").show();
+			}
+		</script>
+		
+		<div id="defaultNav"></div>
+		<br/>
+		<div class="container" id="PedidoItemCadastroContainer">
+			<input type="hidden" class="form-control" id="idPedido"/>
+			<input type="hidden" id="pedidoItemPK.pedido.idPedido" required="true"/>
+			<input type="hidden" class="form-control" id="readonly"/>
+			<div class="card">
+				<div class="card-body">
+					<h3>Cadastro de Itens do Pedido</h3>
+					<hr/>
+					<form>
+						<div class="form-group row">
+							<label for="staticIdProduto" class="col-sm-2 col-form-label">Produto</label>
+							<div class="col-sm-4">
+								<select class="form-control" id="pedidoItemPK.produto.idProduto" required="true">
+									<option value=0>Selecione...</option>
+								</select>
+							</div>
+							<label for="staticQuantidade" class="col-sm-2 col-form-label">Quantidade</label>
+							<div class="col-sm-4">
+								<input type="number" class="form-control" id="quantidade" required="true">
+							</div>
+						</div>
+						<br/>
+						<button type="button" class="btn btn-success" id="salvarPedidoItem">Salvar</button>
+						<button type="button" class="btn btn-warning" onclick="limparPedidoItem()" style="display: none;" id="cancelarPedidoItem">Cancelar</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

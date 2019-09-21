@@ -1,0 +1,135 @@
+<html>
+	<head>
+		<title>Curso de Spring Boot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="default.css">
+		<link rel="stylesheet" type="text/css" href="webjars/fancybox/2.1.5/jquery.fancybox.css" />
+		<link rel="stylesheet" type="text/css" href="webjars/fancybox/2.1.5/helpers/jquery.fancybox-thumbs.css" />
+		<script type="text/javascript" src="webjars/jquery/3.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="webjars/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+		<script type="text/javascript" src="webjars/fancybox/2.1.5/helpers/jquery.fancybox-thumbs.js"></script>
+		<script type="text/javascript" src="default.js"></script>
+	</head>
+	<body>
+		<script>
+			$(function(){
+				loadDefault();
+				
+				if ($("#container-fluid").val() != "") {
+					$("#PedidoItemConsultaContainer").removeClass("container").addClass("container-fluid");
+				}
+				
+				if ($("#PedidoItemConsultaContainer #idPedido").val() != "") {
+					$("#h3PedidoDesc").html("Carrinho de Compras");
+					loadPedidoItens();
+				}
+			});
+			
+			function loadPedidoItens() {
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.PedidoItem.CONSULTAR + "?idPedido=" + $("#idPedido").val(),
+					contentType: "application/json;",
+					success: function(json) {
+						$("#PedidoItemConsultaContainer #tablePedidoItem tbody").empty();
+						if (json != "") {
+							$("#h3PedidoDesc").html("Carrinho de Compras");
+							$("#tablePedidoItem").fadeIn("slow");
+							$(json).each(function(index, item) {
+								var tr = $("<tr/>").attr({
+									"idPedido": $("#idPedido").val(),
+									"idProduto": item.pedidoItemPK.produto.idProduto,
+									"quantidade": item.quantidade
+								});
+								
+								$("<th/>").addClass("align-middle").attr("scope", "row").html(item.pedidoItemPK.produto.nome).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(formatReal(item.pedidoItemPK.produto.preco)).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(item.quantidade).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(formatReal(item.quantidade * item.pedidoItemPK.produto.preco)).appendTo(tr);
+
+								if ($("#PedidoItemConsultaContainer #readonly").val() != "true") {
+									loadDefaultTableActions([Dictionary.Icon.ALTERAR, Dictionary.Icon.DELETAR], "Item").appendTo(tr);
+									tr.find(".imgAlterarItem").on("click", imgAlterarFunction);
+									tr.find(".imgDeletarItem").on("click", imgDeletarFunction);
+								}
+								
+								$("#PedidoItemConsultaContainer #tablePedidoItem tbody").append(tr);
+							});
+						} else {
+							$("#h3PedidoDesc").html("Carrinho de Compras - Vazio");
+							$("#tablePedidoItem").hide();
+						}
+					},
+					error: function(e){
+						alert("Erro ao buscar dados");
+					}
+				});
+			}
+			
+			function imgAlterarFunction() {
+				$("#PedidoItemCadastroContainer #pedidoItemPK\\.pedido\\.idPedido").val($(this).parent().parent().attr("idPedido"));
+				$("#PedidoItemCadastroContainer #pedidoItemPK\\.produto\\.idProduto").attr({
+					"readonly": true
+				}).val($(this).parent().parent().attr("idProduto"));
+				$("#PedidoItemCadastroContainer #quantidade").val($(this).parent().parent().attr("quantidade"));
+				$("#PedidoItemCadastroContainer #cancelarPedidoItem").show();
+				$("#PedidoItemConsultaContainer").hide();
+			}
+			
+			function imgDeletarFunction() {
+				if (window.confirm("Deseja realmente deletar o item do pedido?")) {
+					var data = {
+						pedido: {
+							idPedido: $(this).parent().parent().attr("idPedido")
+						},
+						produto: {
+							idProduto: $(this).parent().parent().attr("idProduto")
+						}
+					};
+					
+					$.ajax({
+						type: "DELETE",
+						url: Dictionary.Service.PedidoItem.DELETAR,
+						contentType: "application/json;",
+						data: JSON.stringify(data),
+						success: function() {
+							loadPedidoItens();
+							alert("Item do pedido deletado");
+						},
+						error: function(e){
+							alert("Erro ao deletar o item do pedido");
+						}
+					});
+				}
+			}
+		</script>
+		
+		<br/>
+		<div class="container" id="PedidoItemConsultaContainer" >
+			<input type="hidden" class="form-control" id="idPedido"/>
+			<input type="hidden" class="form-control" id="readonly"/>
+			<input type="hidden" class="form-control" id="container-fluid"/>
+			<div class="card">
+				<div class="card-body">
+					<h3 id="h3PedidoDesc">Carrinho de Compras</h3>
+					<hr/>
+					<table class="table" id="tablePedidoItem">
+						<thead class="thead-dark">
+							<tr>
+								<th scope="col" style="width: 40%;">Produto</th>
+								<th scope="col" style="width: 20%;">Preço Uni.</th>
+								<th scope="col" style="width: 20%;">Quantidade</th>
+								<th scope="col" style="width: 20%;">Total</th>
+								<th scope="col"></th>
+							</tr>
+						</thead>
+						<tbody/>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,174 @@
+<html>
+	<head>
+		<title>Curso de Spring Boot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="default.css">
+		<script type="text/javascript" src="webjars/jquery/3.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="default.js"></script>
+	</head>
+	<body>
+		<script> 
+			$(function(){
+				loadDefault();
+			});
+			
+			function consultarCliente() {
+				var filter = "";
+				if ($("#idCliente").val() != "") {
+					filter = "idCliente=" + $("#idCliente").val();
+				} else if ($("#nome").val() != "") {
+					filter = "nome=" + $("#nome").val();
+				}
+					
+				if (filter == "") {
+					consultarTodosClientes();
+				} else {
+					consultarUmCliente(filter);
+				}
+			}
+
+			function consultarUmCliente(filter) {
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.Cliente.CONSULTAR + "?" + filter,
+					contentType: "application/json;",
+					success: function(json) {
+						loadItens(json);
+					},
+					error: function(e){
+						$("#containerClientes").fadeOut("slow", function(){
+							$("#tableClientes tbody").empty();
+					    });
+						alert("Erro ao buscar dados");
+					}
+				});
+			}
+			
+			function consultarTodosClientes() {
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.Cliente.CONSULTAR_TODOS,
+					contentType: "application/json;",
+					dataType: "json",
+					success: function(json) {
+						loadItens(json);
+					},
+					error: function(e){
+						$("#containerClientes").fadeOut("slow", function(){
+							$("#tableClientes tbody").empty();
+					    });
+						alert("Erro ao buscar dados");
+					}
+				});
+			}
+			
+			function loadItens(json){
+				if (json != "") {
+					$("#tableClientes tbody").empty();
+					$(json).each(function(index, item) {
+						var tr = $("<tr/>").attr("id", item.idCliente);
+						$("<th/>").addClass("align-middle").attr("scope", "row").html(item.idCliente).appendTo(tr);
+						$("<td/>").addClass("align-middle").html(item.nome).appendTo(tr);
+						$("<td/>").addClass("align-middle").html(item.endereco).appendTo(tr);
+						loadDefaultTableActions([Dictionary.Icon.ALTERAR, Dictionary.Icon.DELETAR], "Cliente").appendTo(tr);
+						$("#tableClientes tbody").append(tr);
+					});
+					$("#containerClientes").fadeIn("slow");
+					loadImgAlterarFunction();
+					loadImgDeletarFunction();
+				} else {
+					alert("Não foi encontrado nenhum Cliente");
+				}
+			}
+			
+			function limparClientes() {
+				$("#idCliente").val("");
+				$("#nome").val("");
+				$("#endereco").val("");
+				$("#containerClientes").fadeOut("slow", function(){
+					$("#tableClientes tbody").empty();
+			    });
+			}
+			
+			function loadImgAlterarFunction() {
+				$(".imgAlterarCliente").on( "click", function() {
+					window.location.href = "ClientesCadastro.html?idCliente=" + $(this).parent().parent().attr("id");
+				});
+			}
+			
+			function loadImgDeletarFunction() {
+				$(".imgDeletarCliente").on( "click", function() {
+					if (window.confirm("Deseja realmente deletar o Cliente?")) {
+						var data = {
+							idCliente: $(this).parent().parent().attr("id")
+						};
+						
+						$.ajax({
+							type: "DELETE",
+							url: Dictionary.Service.Cliente.DELETAR,
+							contentType: "application/json;",
+							dataType: "json",
+							data: JSON.stringify(data),
+							success: function(json) {
+								consultarCliente();
+								alert("Cliente deletado");
+							},
+							error: function(e){
+								alert("Erro ao deletar o Cliente");
+							}
+						});
+					}
+				});
+			}
+		</script>
+		
+		<div id="defaultNav"></div>
+		<br/>
+		<div class="container">
+			<div class="card">
+				<div class="card-body">
+					<h3>Consulta de Clientes</h3>
+					<hr/>
+					<form>
+						<div class="form-group row">
+							<label for="staticIdCliente" class="col-sm-2 col-form-label">Identificador</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="idCliente">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="staticNome" class="col-sm-2 col-form-label">Nome</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="nome">
+							</div>
+						</div>
+						<br/>
+						<a class="btn btn-success" href="ClientesCadastro.html">Criar</a>
+						<button type="button" class="btn btn-success" onclick="consultarCliente()">Consultar</button>
+						<button type="button" class="btn btn-warning" onclick="limparClientes()">Limpar</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<br/>
+		<div class="container" id="containerClientes" style="display: none;">
+			<div class="card">
+				<div class="card-body">
+					<table class="table" id="tableClientes">
+						<thead class="thead-dark">
+							<tr>
+								<th scope="col" style="width: 10%;">Identificador</th>
+								<th scope="col" style="width: 30%;">Nome</th>
+								<th scope="col" style="width: 50%;">Endereço</th>
+								<th scope="col" style="width: 10%;"></th>
+							</tr>
+						</thead>
+						<tbody/>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

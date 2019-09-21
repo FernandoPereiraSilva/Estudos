@@ -1,0 +1,242 @@
+<html>
+	<head>
+		<title>Curso de Spring Boot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="default.css">
+		<link rel="stylesheet" type="text/css" href="webjars/fancybox/2.1.5/jquery.fancybox.css" />
+		<link rel="stylesheet" type="text/css" href="webjars/fancybox/2.1.5/helpers/jquery.fancybox-thumbs.css" />
+		<script type="text/javascript" src="webjars/jquery/3.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="webjars/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+		<script type="text/javascript" src="webjars/fancybox/2.1.5/helpers/jquery.fancybox-thumbs.js"></script>
+		<script type="text/javascript" src="default.js"></script>
+	</head>
+	<body>
+		<script> 
+			$(function(){
+				loadDefault();
+				
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.PedidoStatus.CONSULTAR,
+					contentType: "application/json;",
+					dataType: "json",
+					success: function(json) {
+						$("#idStatus").empty();
+						$("#idStatus").append($("<option/>").attr("value", "").html(Dictionary.COMBO_BOX));
+						$(json).each(function(index, item) {
+							$("#idStatus").append($("<option/>").attr("value", item.idStatus).html(item.dsStatus));
+						});
+					},
+					error: function(e){
+						alert("Erro ao buscar status");
+					}
+				});
+			});
+			
+			function consultarPedido() {
+				var filter = "";
+				if ($("#idPedido").val() != "") {
+					filter += "idPedido=" + $("#idPedido").val();
+				}
+				if ($("#nome").val() != "") {
+					filter += ((filter != "") ? "&" : "") + "nome=" + $("#nome").val();
+				}
+				if ($("#idStatus").val() != "") {
+					filter += ((filter != "") ? "&" : "") + "idStatus=" + $("#idStatus").val();
+				}
+				if ($("#dtPedido").val() != "") {
+					filter += ((filter != "") ? "&" : "") + "dtPedido=" + formatDate($("#dtPedido").val());
+				}
+					
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.Pedido.CONSULTAR + ((filter != "") ? "?" : "") + filter,
+					contentType: "application/json;",
+					success: function(json) {
+						$("#tablePedidos tbody").empty();
+						if (json != "") {
+							$(json).each(function(index, item) {
+								var qtdTotal = 0;
+								var vlTotal = 0;
+								
+								$(item.listPedidoItem).each(function(index, item){
+									qtdTotal += item.quantidade;
+									vlTotal += item.quantidade * item.pedidoItemPK.produto.preco; 
+								});
+								
+								var tr = $("<tr/>").attr("id", item.idPedido).attr("idStatus", item.status.idStatus);
+								$("<th/>").addClass("align-middle").attr("scope", "row").html(item.idPedido).appendTo(tr);
+								$("<td/>").addClass("align-middle").addClass(Dictionary.CssClass.PEDIDO_STATUS + item.status.idStatus).html(item.status.dsStatus).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(item.cliente.nome).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(formatDate(item.dtPedido)).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(qtdTotal).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(formatReal(vlTotal)).appendTo(tr);
+								
+								if (item.status.idStatus == Dictionary.Model.PedidoStatus.CONCLUIDO || item.status.idStatus == Dictionary.Model.PedidoStatus.CANCELADO) {
+									loadDefaultTableActions([Dictionary.Icon.DETALHE, Dictionary.Icon.SEND, Dictionary.Icon.DELETAR], "Pedido").appendTo(tr);
+									tr.find(".imgDetalhePedido").on("click", imgAlterarFunction);
+									tr.find(".imgConcluirPedido, .imgDeletarPedido, .imgAlterarPedido").css({
+										"cursor": "default",
+										"opacity": "0.2"
+									}).off();
+								} else {
+									loadDefaultTableActions([Dictionary.Icon.ALTERAR, Dictionary.Icon.SEND, Dictionary.Icon.DELETAR], "Pedido").appendTo(tr);
+									tr.find(".imgConcluirPedido").on("click", imgConcluirFunction);
+									tr.find(".imgDeletarPedido").on("click", imgDeletarFunction);
+									tr.find(".imgAlterarPedido").on("click", imgAlterarFunction);
+								}
+								
+								$("#tablePedidos tbody").append(tr);
+							});
+							$("#containerPedidos").fadeIn("slow");
+						} else {
+							$("#containerPedidos").fadeOut("slow", function(){
+								$("#tablePedidos tbody").empty();
+						    });
+						}
+					},
+					error: function(e){
+						$("#containerPedidos").fadeOut("slow", function(){
+							$("#tablePedidos tbody").empty();
+					    });
+						alert("Erro ao buscar dados");
+					}
+				});
+			}
+			
+			function limparPedidos() {
+				$("#idPedido").val("");
+				$("#nome").val("");
+				$("#preco").val("");
+				$("#containerPedidos").fadeOut("slow", function(){
+					$("#tablePedidos tbody").empty();
+			    });
+			}
+			
+			function imgConcluirFunction() {
+				if (window.confirm("Deseja realmente concluir o Pedido?")) {
+					var data = {
+						idPedido: $(this).parent().parent().attr("id"),
+						status: {
+							idStatus: Dictionary.Model.PedidoStatus.CONCLUIDO
+						}
+					};
+					
+					$.ajax({
+						type: "PATCH",
+						url: Dictionary.Service.Pedido.ALTERAR,
+						contentType: "application/json;",
+						dataType: "json",
+						data: JSON.stringify(data),
+						success: function(json) {
+							consultarPedido();
+							alert("Pedido concluido");
+						},
+						error: function(e){
+							alert("Erro ao concluir o Pedido");
+						}
+					});
+				}
+			}
+			
+			function imgDeletarFunction() {
+				if (window.confirm("Deseja realmente cancelar o Pedido?")) {
+					var data = {
+						idPedido: $(this).parent().parent().attr("id"),
+						status: {
+							idStatus: Dictionary.Model.PedidoStatus.CANCELADO
+						}
+					};
+					
+					$.ajax({
+						type: "PATCH",
+						url: Dictionary.Service.Pedido.ALTERAR,
+						contentType: "application/json;",
+						dataType: "json",
+						data: JSON.stringify(data),
+						success: function(json) {
+							consultarPedido();
+							alert("Pedido cancelado");
+						},
+						error: function(e){
+							alert("Erro ao cancelar o Pedido");
+						}
+					});
+				}
+			}
+			
+			function imgAlterarFunction() {
+				if ($(this).parent().parent().attr("idStatus") == Dictionary.Model.PedidoStatus.CONCLUIDO || $(this).parent().parent().attr("idStatus") == Dictionary.Model.PedidoStatus.CANCELADO) {
+					window.location.href = "PedidosCadastro.html?readonly=true&idPedido=" + $(this).parent().parent().attr("id");
+				} else {
+					window.location.href = "PedidosCadastro.html?idPedido=" + $(this).parent().parent().attr("id");
+				}
+			}
+		</script>
+		
+		<div id="defaultNav"></div>
+		<br/>
+		<div class="container">
+			<div class="card">
+				<div class="card-body">
+					<h3>Consulta de Pedidos</h3>
+					<hr/>
+					<form>
+						<div class="form-group row">
+							<label for="staticIdPedido" class="col-sm-2 col-form-label">Identificador</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="idPedido">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="staticNome" class="col-sm-2 col-form-label">Cliente</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="nome">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="staticIdStatus" class="col-sm-2 col-form-label">Status</label>
+							<div class="col-sm-4">
+								<select class="form-control" id="idStatus">
+									<option value=0>Selecione...</option>
+								</select>
+							</div>
+							<label for="staticDtPedido" class="col-sm-2 col-form-label">Data</label>
+							<div class="col-sm-4">
+								<input type="date" class="form-control" id="dtPedido">
+							</div>
+						</div>
+						<br/>
+						<a class="btn btn-success" href="PedidosCadastro.html">Criar</a>
+						<button type="button" class="btn btn-success" onclick="consultarPedido()">Consultar</button>
+						<button type="button" class="btn btn-warning" onclick="limparPedidos()">Limpar</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<br/>
+		<div class="container" id="containerPedidos" style="display: none;">
+			<div class="card">
+				<div class="card-body">
+					<table class="table" id="tablePedidos">
+						<thead class="thead-dark">
+							<tr>
+								<th scope="col" style="width: 10%;">Identificador</th>
+								<th scope="col" style="width: 10%;">Status</th>
+								<th scope="col" style="width: 20%;">Cliente</th>
+								<th scope="col" style="width: 20%;">Data do Pedido</th>
+								<th scope="col" style="width: 10%;">Qtd. Itens</th>
+								<th scope="col" style="width: 10%;">Valor total</th>
+								<th scope="col" style="width: 20%;"></th>
+							</tr>
+						</thead>
+						<tbody/>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

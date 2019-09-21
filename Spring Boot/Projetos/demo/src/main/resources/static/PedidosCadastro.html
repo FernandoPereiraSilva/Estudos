@@ -1,0 +1,230 @@
+<html>
+	<head>
+		<title>Curso de Spring Boot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="default.css">
+		<link rel="stylesheet" type="text/css" href="webjars/fancybox/2.1.5/jquery.fancybox.css" />
+		<link rel="stylesheet" type="text/css" href="webjars/fancybox/2.1.5/helpers/jquery.fancybox-thumbs.css" />
+		<script type="text/javascript" src="webjars/jquery/3.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="webjars/fancybox/2.1.5/jquery.fancybox.pack.js"></script>
+		<script type="text/javascript" src="webjars/fancybox/2.1.5/helpers/jquery.fancybox-thumbs.js"></script>
+		<script type="text/javascript" src="default.js"></script>
+	</head>
+	<body>
+		<script>
+			var flLoadPedido = false;	
+		
+			$(function(){
+				loadDefault();
+				loadPedidoStatus();
+				loadCliente();
+			});
+			
+			function loadPedidoStatus() {
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.PedidoStatus.CONSULTAR,
+					contentType: "application/json;",
+					dataType: "json",
+					success: function(json) {
+						$("#status\\.idStatus").empty();
+						$("#status\\.idStatus").append($("<option/>").attr("value", "").html(Dictionary.COMBO_BOX));
+						$(json).each(function(index, item) {
+							$("#status\\.idStatus").append($("<option/>").attr("value", item.idStatus).html(item.dsStatus));
+						});
+						
+						if (flLoadPedido) {
+							loadPedido();
+						} else {
+							flLoadPedido = true;
+						}
+					},
+					error: function(e){
+						alert("Erro ao buscar status");
+					}
+				});
+			}
+			
+			function loadCliente() {
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.Cliente.CONSULTAR_TODOS,
+					contentType: "application/json;",
+					dataType: "json",
+					success: function(json) {
+						$("#cliente\\.idCliente").empty();
+						$("#cliente\\.idCliente").append($("<option/>").attr("value", "").html(Dictionary.COMBO_BOX));
+						$(json).each(function(index, item) {
+							$("#cliente\\.idCliente").append($("<option/>").attr("value", item.idCliente).html(item.nome));
+						});
+						
+						if (flLoadPedido) {
+							loadPedido();
+						} else {
+							flLoadPedido = true;
+						}
+					},
+					error: function(e){
+						alert("Erro ao buscar status");
+					}
+				});
+			}
+			
+			function loadPedido() {
+				if ($("#idPedido").val() != "") {
+					$.ajax({
+						type: "GET",
+						url: Dictionary.Service.Pedido.CONSULTAR + "?idPedido=" + $("#idPedido").val(),
+						contentType: "application/json;",
+						success: function(json) {
+							if (json != "") {
+								jsonToFields(json);
+								if ($("#status\\.idStatus").val() == Dictionary.Model.PedidoStatus.CONCLUIDO || $("#status\\.idStatus").val() == Dictionary.Model.PedidoStatus.CANCELADO) {
+									$("#buttonDeletarPedido, #buttonSalvarPedido").hide();
+									$("#idPedido, #cliente\\.idCliente, #status\\.idStatus, #dtPedido").attr("readonly", true).attr("disabled", true);
+									$("#pedidoItemConsulta").load("PedidoItemConsulta.html?readonly=true&idPedido=" + $("#idPedido").val()).show();
+								} else {
+									$("#PedidoCadastroContainer #status\\.idStatus").attr({"readonly": false, "disabled": false});
+									$("#cliente\\.idCliente, #dtPedido").attr("readonly", true);
+									$("#pedidoItemCadastro").load("PedidoItemCadastro.html?idPedido=" + $("#idPedido").val()).show();
+									$("#pedidoItemConsulta").load("PedidoItemConsulta.html?idPedido=" + $("#idPedido").val()).show();
+									$("#buttonDeletarPedido, #buttonSalvarPedido").show();
+								}
+							} else {
+								$("#buttonDeletarPedido").hide();
+								alert("Não foi encontrado nenhum Pedido");
+							}
+						},
+						error: function(e){
+							$("#buttonDeletarPedido").hide();
+							alert("Erro ao buscar dados");
+						}
+					});
+				} else {
+					$("#PedidoCadastroContainer #status\\.idStatus").attr({"readonly": true, "disabled": true});
+					$("#buttonDeletarPedido").hide();
+					$("#buttonSalvarPedido").show();
+				}
+			}
+			
+			function salvarPedido() {
+				if ($("#PedidoCadastroContainer #idPedido").val() != "" && $("#PedidoCadastroContainer #status\\.idStatus").val() > 0) {
+					var data = fieldsToJson("PedidoCadastroContainer", "#idPedido, #status\\.idStatus");
+					
+					$.ajax({
+						type: "PATCH",
+						url: Dictionary.Service.Pedido.ALTERAR,
+						contentType: "application/json;",
+						dataType: "json",
+						data: JSON.stringify(data),
+						success: function(json) {
+							window.location.href = "PedidosCadastro.html?readonly=true&idPedido=" + json.idPedido;
+							alert("Pedido alterado");
+						},
+						error: function(e){
+							alert("Erro ao alterar o Pedido");
+						}
+					});
+				} else if ($("#PedidoCadastroContainer #cliente\\.idCliente").val() > 0){
+					var data = fieldsToJson("PedidoCadastroContainer", "#cliente\\.idCliente");
+					
+					$.ajax({
+						type: "POST",
+						url: Dictionary.Service.Pedido.CADASTRAR,
+						contentType: "application/json;",
+						dataType: "json",
+						data: JSON.stringify(data),
+						success: function(json) {
+							window.location.href = "PedidosCadastro.html?idPedido=" + json.idPedido;
+							alert("Cadastro salvo com sucesso!");
+						},
+						error: function(e){
+							alert("Erro ao salvar o Pedido");
+						}
+					});
+				} else {
+					alert("Favor preencher os campos obrigatórios");
+				}
+			}
+			
+			function deletarPedido() {
+				if (window.confirm("Deseja realmente deletar o Pedido?")) {
+					if ($("#idPedido").val() != "") {
+						var data = {
+							idPedido: $("#idPedido").val(),
+							status: {
+								idStatus: Dictionary.Model.PedidoStatus.CANCELADO
+							}
+						};
+						
+						$.ajax({
+							type: "PATCH",
+							url: Dictionary.Service.Pedido.ALTERAR,
+							contentType: "application/json;",
+							dataType: "json",
+							data: JSON.stringify(data),
+							success: function(json) {
+								window.location.href = "PedidosCadastro.html?readonly=true&idPedido=" + json.idPedido;
+								alert("Pedido cancelado");
+							},
+							error: function(e){
+								alert("Erro ao cancelar o Pedido");
+							}
+						});
+					} else {
+						alert("Favor preencher o Identificador do Pedido");
+					}
+				}
+			}
+		</script>
+		
+		<div id="defaultNav"></div>
+		<br/>
+		<div class="container" id="PedidoCadastroContainer">
+			<input type="hidden" class="form-control" id="readonly"/>
+			<div class="card">
+				<div class="card-body">
+					<h3>Cadastro de Pedidos</h3>
+					<hr/>
+					<form>
+						<div class="form-group row">
+							<label for="staticIdPedido" class="col-sm-2 col-form-label">Identificador</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="idPedido" name="idPedido" readonly>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="staticNome" class="col-sm-2 col-form-label">Cliente</label>
+							<div class="col-sm-10">
+								<select class="form-control" id="cliente.idCliente" required="true">
+									<option value=0>Selecione...</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="staticIdStatus" class="col-sm-2 col-form-label">Status</label>
+							<div class="col-sm-4">
+								<select class="form-control" id="status.idStatus" required="true" readonly disabled>
+									<option value=0>Selecione...</option>
+								</select>
+							</div>
+							<label for="staticDtPedido" class="col-sm-2 col-form-label">Data</label>
+							<div class="col-sm-4">
+								<input type="date" class="form-control" id="dtPedido" readonly>
+							</div>
+						</div>
+						<br/>
+						<button type="button" class="btn btn-success" onclick="salvarPedido()" id="buttonSalvarPedido" style="display: none;">Salvar</button>
+						<button type="button" class="btn btn-danger" onclick="deletarPedido()" id="buttonDeletarPedido" style="display: none;">Excluir</button>
+						<a class="btn btn-warning" href="PedidosConsulta.html">Voltar</a>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div id="pedidoItemCadastro" style="display: none;" > </div>
+		<div id="pedidoItemConsulta" style="display: none;" > </div>
+	</body>
+</html>

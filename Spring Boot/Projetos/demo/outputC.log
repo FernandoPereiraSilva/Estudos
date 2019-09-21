@@ -1,0 +1,66 @@
+20/09/2019 15:24:00 [main] INFO  com.example.demo.DemoApplication - Starting DemoApplication on RD501572 with PID 14132 (C:\workspace-trabalho-spring\curso-spring-boot\demo\target\classes started by FePSilva in C:\workspace-trabalho-spring\curso-spring-boot\demo)
+20/09/2019 15:24:00 [main] INFO  com.example.demo.DemoApplication - No active profile set, falling back to default profiles: default
+20/09/2019 15:24:03 [main] INFO  org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data repositories in DEFAULT mode.
+20/09/2019 15:24:03 [main] INFO  org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 156ms. Found 5 repository interfaces.
+20/09/2019 15:24:04 [main] INFO  org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$67d5274b] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+20/09/2019 15:24:04 [main] INFO  org.springframework.context.support.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.hateoas.config.HateoasConfiguration' of type [org.springframework.hateoas.config.HateoasConfiguration$$EnhancerBySpringCGLIB$$e755747d] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+20/09/2019 15:24:04 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+20/09/2019 15:24:04 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+20/09/2019 15:24:04 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+20/09/2019 15:24:05 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.22]
+20/09/2019 15:24:05 [main] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+20/09/2019 15:24:05 [main] INFO  org.springframework.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 4962 ms
+20/09/2019 15:24:06 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+20/09/2019 15:24:07 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+20/09/2019 15:24:07 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [
+	name: default
+	...]
+20/09/2019 15:24:07 [main] INFO  org.hibernate.Version - HHH000412: Hibernate Core {5.3.10.Final}
+20/09/2019 15:24:07 [main] INFO  org.hibernate.cfg.Environment - HHH000206: hibernate.properties not found
+20/09/2019 15:24:07 [main] INFO  org.hibernate.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.0.4.Final}
+20/09/2019 15:24:08 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+20/09/2019 15:24:08 [main] WARN  org.hibernate.mapping.RootClass - HHH000038: Composite-id class does not override equals(): com.example.demo.model.PedidoItemPK
+20/09/2019 15:24:08 [main] WARN  org.hibernate.mapping.RootClass - HHH000039: Composite-id class does not override hashCode(): com.example.demo.model.PedidoItemPK
+20/09/2019 15:24:09 [main] INFO  org.hibernate.tool.schema.internal.SchemaCreatorImpl - HHH000476: Executing import script 'org.hibernate.tool.schema.internal.exec.ScriptSourceInputNonExistentImpl@2674d4f6'
+20/09/2019 15:24:09 [main] INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+20/09/2019 15:24:10 [main] INFO  org.hibernate.hql.internal.QueryTranslatorFactoryInitiator - HHH000397: Using ASTQueryTranslatorFactory
+20/09/2019 15:24:12 [main] INFO  org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor - Initializing ExecutorService 'applicationTaskExecutor'
+20/09/2019 15:24:12 [main] WARN  org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration$JpaWebMvcConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+20/09/2019 15:24:12 [main] INFO  org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+20/09/2019 15:24:13 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+20/09/2019 15:24:13 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+20/09/2019 15:24:13 [main] INFO  com.example.demo.DemoApplication - Started DemoApplication in 14.382 seconds (JVM running for 35.721)
+20/09/2019 15:25:09 [http-nio-8080-exec-1] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+20/09/2019 15:25:09 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+20/09/2019 15:25:09 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 35 ms
+20/09/2019 15:26:40 [http-nio-8080-exec-5] INFO  com.example.demo.controller.ClienteRestService - Service: service/cliente/consultar/todos. Method: GET (getClientes) - Iniciando listagem de todos os clientes
+20/09/2019 15:26:46 [http-nio-8080-exec-2] INFO  com.example.demo.controller.ClienteRestService - Service: service/cliente/cadastrar. Method: POST (createCliente) - Iniciando criação de cliente
+20/09/2019 15:26:47 [http-nio-8080-exec-2] INFO  com.example.demo.controller.ClienteRestService - Service: service/cliente/cadastrar. Method: POST (createCliente) - Cliente criado, id 5
+20/09/2019 15:26:51 [http-nio-8080-exec-5] INFO  com.example.demo.controller.PedidoStatusRestService - Service: service/pedidoStatus/consultar. Method: GET (getPedidoStatus) - Iniciando listagem de todos os status
+20/09/2019 15:26:53 [http-nio-8080-exec-7] INFO  com.example.demo.controller.PedidoStatusRestService - Service: service/pedidoStatus/consultar. Method: GET (getPedidoStatus) - Iniciando listagem de todos os status
+20/09/2019 15:26:53 [http-nio-8080-exec-8] INFO  com.example.demo.controller.ClienteRestService - Service: service/cliente/consultar/todos. Method: GET (getClientes) - Iniciando listagem de todos os clientes
+20/09/2019 15:28:40 [http-nio-8080-exec-4] INFO  com.example.demo.controller.PedidoStatusRestService - Service: service/pedidoStatus/consultar. Method: GET (getPedidoStatus) - Iniciando listagem de todos os status
+20/09/2019 15:28:40 [http-nio-8080-exec-5] INFO  com.example.demo.controller.ClienteRestService - Service: service/cliente/consultar/todos. Method: GET (getClientes) - Iniciando listagem de todos os clientes
+20/09/2019 15:28:43 [http-nio-8080-exec-7] INFO  com.example.demo.controller.PedidoRestService - Service: service/pedido/cadastrar. Method: POST (createPedido) - Iniciando criação de pedido
+20/09/2019 15:28:43 [http-nio-8080-exec-7] INFO  com.example.demo.controller.PedidoRestService - Service: service/pedido/cadastrar. Method: POST (createPedido) - Pedido criado, id 3
+20/09/2019 15:28:45 [http-nio-8080-exec-10] INFO  com.example.demo.controller.PedidoStatusRestService - Service: service/pedidoStatus/consultar. Method: GET (getPedidoStatus) - Iniciando listagem de todos os status
+20/09/2019 15:28:45 [http-nio-8080-exec-2] INFO  com.example.demo.controller.ClienteRestService - Service: service/cliente/consultar/todos. Method: GET (getClientes) - Iniciando listagem de todos os clientes
+20/09/2019 15:28:45 [http-nio-8080-exec-9] INFO  com.example.demo.controller.PedidoRestService - Service: service/pedido/consultar. Method: GET (getPedido) - Retornando o pedido
+20/09/2019 15:28:45 [http-nio-8080-exec-4] INFO  com.example.demo.controller.ProdutoRestService - Service: service/produto/consultar/todos. Method: GET (getProdutos) - Iniciando listagem de todos os produtos
+20/09/2019 15:28:45 [http-nio-8080-exec-5] INFO  com.example.demo.controller.PedidoItemRestService - Service: service/pedidoItem/consultar. Method: GET (getPedidoItem) - Iniciando listagem de todos os itens do pedido
+20/09/2019 15:28:57 [http-nio-8080-exec-6] INFO  com.example.demo.controller.PedidoItemRestService - Service: service/pedidoItem/cadastrar. Method: POST (createPedidoItem) - Iniciando criação do item do pedido
+20/09/2019 15:28:57 [http-nio-8080-exec-6] INFO  com.example.demo.controller.PedidoItemRestService - Service: service/pedidoItem/cadastrar. Method: POST (createPedidoItem) - Item do pedido criado
+20/09/2019 15:28:57 [http-nio-8080-exec-7] INFO  com.example.demo.controller.PedidoItemRestService - Service: service/pedidoItem/consultar. Method: GET (getPedidoItem) - Iniciando listagem de todos os itens do pedido
+20/09/2019 15:29:04 [http-nio-8080-exec-8] INFO  com.example.demo.controller.PedidoRestService - Service: service/pedido/alterar. Method: PATCH (patchPedido) - Iniciando a alteração por atributos do pedido
+20/09/2019 15:29:04 [http-nio-8080-exec-8] INFO  com.example.demo.controller.PedidoRestService - Service: service/pedido/consultar. Method: GET (getPedido) - Retornando o pedido
+20/09/2019 15:29:04 [http-nio-8080-exec-8] INFO  com.example.demo.controller.PedidoRestService - Service: service/pedido/alterar. Method: PATCH (patchPedido) - Alterando o pedido 3
+20/09/2019 15:29:05 [http-nio-8080-exec-2] INFO  com.example.demo.controller.PedidoStatusRestService - Service: service/pedidoStatus/consultar. Method: GET (getPedidoStatus) - Iniciando listagem de todos os status
+20/09/2019 15:29:05 [http-nio-8080-exec-9] INFO  com.example.demo.controller.ClienteRestService - Service: service/cliente/consultar/todos. Method: GET (getClientes) - Iniciando listagem de todos os clientes
+20/09/2019 15:29:05 [http-nio-8080-exec-1] INFO  com.example.demo.controller.PedidoRestService - Service: service/pedido/consultar. Method: GET (getPedido) - Retornando o pedido
+20/09/2019 15:29:05 [http-nio-8080-exec-5] INFO  com.example.demo.controller.PedidoItemRestService - Service: service/pedidoItem/consultar. Method: GET (getPedidoItem) - Iniciando listagem de todos os itens do pedido
+20/09/2019 15:29:58 [RMI TCP Connection(15)-127.0.0.1] INFO  org.springframework.boot.admin.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+20/09/2019 15:29:58 [RMI TCP Connection(15)-127.0.0.1] INFO  org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor - Shutting down ExecutorService 'applicationTaskExecutor'
+20/09/2019 15:29:58 [RMI TCP Connection(15)-127.0.0.1] INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+20/09/2019 15:29:58 [RMI TCP Connection(15)-127.0.0.1] INFO  org.hibernate.tool.schema.internal.SchemaDropperImpl$DelayedDropActionImpl - HHH000477: Starting delayed evictData of schema as part of SessionFactory shut-down'
+20/09/2019 15:29:58 [RMI TCP Connection(15)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+20/09/2019 15:29:58 [RMI TCP Connection(15)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

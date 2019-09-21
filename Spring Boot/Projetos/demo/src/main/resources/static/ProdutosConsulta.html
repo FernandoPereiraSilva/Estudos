@@ -1,0 +1,182 @@
+<html>
+	<head>
+		<title>Curso de Spring Boot</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="default.css">
+		<script type="text/javascript" src="webjars/jquery/3.4.1/jquery.min.js"></script>
+		<script type="text/javascript" src="webjars/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="default.js"></script>
+	</head>
+	<body>
+		<script> 
+			$(function(){
+				loadDefault();
+			});
+			
+			function consultarProduto() {
+				var filter = "";
+				if ($("#idProduto").val() != "") {
+					filter = "idProduto=" + $("#idProduto").val();
+				} else if ($("#nome").val() != "") {
+					filter = "nome=" + $("#nome").val();
+				}
+					
+				if (filter == "") {
+					consultarTodosProdutos();
+				} else {
+					consultarUmProduto(filter);
+				}
+			}
+
+			function consultarUmProduto(filter) {
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.Produto.CONSULTAR + "?" + filter,
+					contentType: "application/json;",
+					success: function(json) {
+						if (json != "") {
+							$("#tableProdutos tbody").empty();
+							$(json).each(function(index, item) {
+								var tr = $("<tr/>");
+								$("<th/>").addClass("align-middle").attr("scope", "row").html(item.idProduto).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(item.nome).appendTo(tr);
+								$("<td/>").addClass("align-middle").html(formatReal(item)).appendTo(tr);
+								loadDefaultTableActions([Dictionary.Icon.ALTERAR, Dictionary.Icon.DELETAR], "Produto").appendTo(tr);
+								$("#tableProdutos tbody").append(tr);
+							});
+							$("#containerProdutos").fadeIn("slow");
+							loadImgAlterarFunction();
+							loadImgDeletarFunction();
+						} else {
+							alert("Não foi encontrado nenhum Produto");
+						}
+					},
+					error: function(e){
+						$("#containerProdutos").fadeOut("slow", function(){
+							$("#tableProdutos tbody").empty();
+					    });
+						alert("Erro ao buscar dados");
+					}
+				});
+			}
+			
+			function consultarTodosProdutos() {
+				$.ajax({
+					type: "GET",
+					url: Dictionary.Service.Produto.CONSULTAR_TODOS,
+					contentType: "application/json;",
+					dataType: "json",
+					success: function(json) {
+						$("#tableProdutos tbody").empty();
+						$(json).each(function(index, item) {
+							var tr = $("<tr/>").attr("id", item.idProduto);
+							$("<th/>").addClass("align-middle").attr("scope", "row").html(item.idProduto).appendTo(tr);
+							$("<td/>").addClass("align-middle").html(item.nome).appendTo(tr);
+							$("<td/>").addClass("align-middle").html(("R$ " + item.preco.toFixed(2)).replace(".", ",")).appendTo(tr);
+							loadDefaultTableActions([Dictionary.Icon.ALTERAR, Dictionary.Icon.DELETAR], "Produto").appendTo(tr);
+							$("#tableProdutos tbody").append(tr);
+						});
+						$("#containerProdutos").fadeIn("slow");
+						loadImgAlterarFunction();
+						loadImgDeletarFunction();
+					},
+					error: function(e){
+						$("#containerProdutos").fadeOut("slow", function(){
+							$("#tableProdutos tbody").empty();
+					    });
+						alert("Erro ao buscar dados");
+					}
+				});
+			}
+			
+			function limparProdutos() {
+				$("#idProduto").val("");
+				$("#nome").val("");
+				$("#preco").val("");
+				$("#containerProdutos").fadeOut("slow", function(){
+					$("#tableProdutos tbody").empty();
+			    });
+			}
+			
+			function loadImgAlterarFunction() {
+				$(".imgAlterarProduto").on( "click", function() {
+					id = 2;
+					window.location.href = "ProdutosCadastro.html?idProduto=" + $(this).parent().parent().attr("id");
+				});
+			}
+			
+			function loadImgDeletarFunction() {
+				$(".imgDeletarProduto").on( "click", function() {
+					if (window.confirm("Deseja realmente deletar o Produto?")) {
+						var data = {
+							idProduto: $(this).parent().parent().attr("id")
+						};
+						
+						$.ajax({
+							type: "DELETE",
+							url: Dictionary.Service.Produto.DELETAR,
+							contentType: "application/json;",
+							dataType: "json",
+							data: JSON.stringify(data),
+							success: function(json) {
+								consultarProduto();
+								alert("Produto deletado");
+							},
+							error: function(e){
+								alert("Erro ao deletar o Produto");
+							}
+						});
+					}
+				});
+			}
+		</script>
+		
+		<div id="defaultNav"></div>
+		<br/>
+		<div class="container">
+			<div class="card">
+				<div class="card-body">
+					<h3>Consulta de Produtos</h3>
+					<hr/>
+					<form>
+						<div class="form-group row">
+							<label for="staticIdProduto" class="col-sm-2 col-form-label">Identificador</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="idProduto">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="staticNome" class="col-sm-2 col-form-label">Nome</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="nome">
+							</div>
+						</div>
+						<br/>
+						<a class="btn btn-success" href="ProdutosCadastro.html">Criar</a>
+						<button type="button" class="btn btn-success" onclick="consultarProduto()">Consultar</button>
+						<button type="button" class="btn btn-warning" onclick="limparProdutos()">Limpar</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<br/>
+		<div class="container" id="containerProdutos" style="display: none;">
+			<div class="card">
+				<div class="card-body">
+					<table class="table" id="tableProdutos">
+						<thead class="thead-dark">
+							<tr>
+								<th scope="col" style="width: 10%;">Identificador</th>
+								<th scope="col" style="width: 50%;">Nome</th>
+								<th scope="col" style="width: 20%;">Preço</th>
+								<th scope="col" style="width: 20%;"></th>
+							</tr>
+						</thead>
+						<tbody/>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

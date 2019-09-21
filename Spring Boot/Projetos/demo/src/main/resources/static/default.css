@@ -1,0 +1,19 @@
+nav {
+	width: 100%;
+	overflow: hidden;
+}
+
+.PedidoStatus1 {
+	color: #ffc107!important;
+	font-weight: 700!important;
+}
+
+.PedidoStatus2 {
+	color: #28a745!important;
+	font-weight: 700!important;
+}
+
+.PedidoStatus3 {
+	color: #dc3545!important;
+	font-weight: 700!important;
+}
